@@ -1,0 +1,78 @@
+body {
+	font-family: 'PT Sans', sans-serif;
+	background-color: rgba(234,234,234,255);
+}
+.all-verbs {
+	float: left;
+	font-size: 36px;
+}
+.box {
+	margin: 7% 20%;
+	padding: 50px;
+	border: 1px solid black;
+	background: rgba(255,255,255,255);
+	min-width: 900px;
+	max-width: 900px;
+}
+.new {
+	float: right;
+	background: rgba(173,234,185,255);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 14px 25px;
+	margin-left: 5px;
+	color: white;
+}
+.new-verb-button {
+	margin-top: 70px;
+}
+.searching-input {
+	border: none;
+	float: right;
+	height: 47px;
+	width: 342px;
+	background: rgba(249,249,249,255);
+}
+.searching-input::placeholder {
+	font-weight: bold;
+	opacity: 0.8;
+	color: rgba(163,163,163,255);
+	padding-left: 20px;
+}
+.menu {
+	margin: -50px -50px;
+	background: rgba(247,247,247,255);
+	height: 60px;
+	border-bottom: 1px solid rgba(233,233,233,255);
+}
+.learning {
+	float: left;
+	color: rgba(110,110,110,255);
+	padding: 20px 40px 20px 50px;
+}
+.verbs {
+	float: left;
+	color: rgba(110,110,110,255);
+	padding: 20px 40px 20px 0;
+
+}
+.words {
+	float: left;
+	color: rgba(110,110,110,255);
+	padding: 20px 40px 20px 0;
+
+}
+.groups {
+	float: left;
+	color: rgba(110,110,110,255);
+	padding: 20px 40px 20px 0;
+}
+.clearfix {
+	clear: both;
+}
+.name {
+	float: right;
+	font-size: 20px;
+	padding: 20px 49px 15px;
+}
