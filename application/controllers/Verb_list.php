@@ -26,7 +26,7 @@ class Verb_list extends CI_Controller
     public function showVerbs()
     {
         $verbs =  $this->getVerbsFromDB();
-		$data = [
+        $data = [
             'verbs' => $verbs
         ];
         echo json_encode($data);

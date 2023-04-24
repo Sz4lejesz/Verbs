@@ -14,36 +14,46 @@ require_once 'header.php';
 		<div class="clearfix"></div>
 		<div class="new-verb-button">
 			<div class="all-verbs">Wszystkie czasowniki</div>
-			<div class="new">NOWY</div>
+			<div class="new" @click="addVerbPopUp = true">NOWY</div>
 			<input type="text" class="searching-input" placeholder="czego szukamy?">
 		</div>
+		<div class="overlay" v-if="addVerbPopUp"></div>
+		<div class="clearfix"></div>
 		<div class="add-verb" v-if="addVerbPopUp">
-<!--				<strong>Dodaj nowy czasownik</strong> <br>-->
-<!--				<label for="PL">pl</label>-->
-<!--				<input type="text" class="" id="PL" v-model="newVerb.verbInPolish"> <br>-->
-<!--				<label for="infinitive">infinitive</label>-->
-<!--				<input type="text" class="" id="infinitive" v-model="newVerb.verbInInfinitive"> <br>-->
-<!--				<label for="pastSimple1">Past Simple *</label>-->
-<!--				<input type="text" class="" id="pastSimple1" v-model="newVerb.verbInPastSimple1">-->
-<!--				<label for="pastSimple2">Past Simple </label>-->
-<!--				<input type="text" class="" id="pastSimple2" v-model="newVerb.verbInPastSimple2"> <br>-->
-<!--				<label for="pastParticiple1">Past Participle *</label>-->
-<!--				<input type="text" class="" id="pastParticiple1" v-model="newVerb.verbInPastParticiple1">-->
-<!--				<label for="pastParticiple2">Past Participle </label>-->
-<!--				<input type="text" class="" id="pastParticiple2" v-model="newVerb.verbInPastParticiple2"> <br>-->
-<!--				<label for="additionalDescription">Dodatkowy opis PL </label>-->
-<!--				<input type="text" class="" id="additionalDescription" v-model="newVerb.additionalDescription"> <br>-->
-<!--				<button @click="addVerbPopUp = false">zamknij</button> <br>-->
-<!--				<button @click="saveVerb()">Wyślij</button>-->
-			</div> <br> <br> <br>
+			<div class="new-verb">Nowy czasownik</div>
+			<div class="stripe"></div>
+			<div class="z-index-PL">PL *</div>
+			<input type="text" class="PL-input" id="PL" v-model="newVerb.verbInPolish">
+			<div class="z-index-infinitive">Infinitive</div>
+			<input type="text" class="infinitive-input" id="infinitive" v-model="newVerb.verbInInfinitive">
+			<div class="clearfix"></div>
+			<div class="z-index-simple1">Past Simple *</div>
+			<input type="text" class="past-simple-1-input" id="pastSimple1" v-model="newVerb.verbInPastSimple1">
+			<div class="z-index-simple2">Past Simple</div>
+			<input type="text" class="past-simple-2-input" id="pastSimple2" v-model="newVerb.verbInPastSimple2">
+			<div class="clearfix"></div>
+			<div class="z-index-participle1">Past Participle *</div>
+			<input type="text" class="past-participle-1-input" id="pastParticiple1" v-model="newVerb.verbInPastParticiple1">
+			<div class="z-index-participle2">Past Participle</div>
+			<input type="text" class="past-participle-2-input" id="pastParticiple2" v-model="newVerb.verbInPastParticiple2">
+			<div class="z-index-description">PL Dodatkowy Opis</div>
+			<textarea name="groupAdditional" rows="2" class="form-control" id="additionalDescription" v-model="newVerb.additionalDescription"></textarea>
+			<div class="clearfix"></div>
+			<img src="images/cross.png" alt="dasd">
+			<button @click="addVerbPopUp = false" class="close-button">zamknij</button>
+			<button @click="saveVerb()" class="save-button">DODAJ</button>
+		</div>
+		<div class="clearfix"></div>
 			<div class="verb-list" v-for="verb in verbsObject">
-				{{ verb.verbInPolish }} -
-				{{ verb.verbInInfinitive }} -
-				{{ verb.verbInPastSimple1 }} ->
-				{{ verb.verbInPastSimple2 }}
-				{{ verb.verbInPastParticiple1 }}
-				{{ verb.verbInPastParticiple2 }}
-				{{ verb.additionalDescription }}
+				<div class="verbs-list">
+					{{ verb.verbInInfinitive }} -
+					{{ verb.verbInPastSimple1 }} -
+					{{ verb.verbInPastParticiple1 }} ->
+					{{ verb.verbInPolish }}
+				</div>
+				<div class="delete">usuń</div>
+				<div class="edit">edytuj</div>
+				<div class="clearfix"></div>
 			</div>
 			<div class="announcement"></div>
 			{{ announcement }}
@@ -55,7 +65,7 @@ const { createApp } = Vue
 createApp({
 	data() {
 		return {
-			addVerbPopUp: false,
+			addVerbPopUp: true,
 			announcement: '',
 			verbsObject: {},
 			newVerb: {
@@ -104,7 +114,6 @@ createApp({
 					}
 				})
 				.then(function (response) {
-					console.log(data)
 					if (response.data.verbs) {
 						app.verbsObject = {};
 						app.verbsObject = response.data.verbs;
