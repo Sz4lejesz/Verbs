@@ -15,36 +15,37 @@ require_once 'header.php';
 		<div class="new-verb-button">
 			<div class="all-verbs">Wszystkie czasowniki</div>
 			<div class="new" @click="addVerbPopUp = true">NOWY</div>
-			<input type="text" class="searching-input" placeholder="czego szukamy?">
+			<input autocomplete="off" type="text" class="searching-input" placeholder="czego szukamy?">
 		</div>
 		<div class="overlay" v-if="addVerbPopUp"></div>
 		<div class="clearfix"></div>
 		<div class="add-verb" v-if="addVerbPopUp">
 			<div class="new-verb">Nowy czasownik</div>
+<!--			<button @click="addVerbPopUp = false" class="close-button">zamknij</button>-->
+			<img src="content/images/cross.png" height="22" width="20" @click="addVerbPopUp = false" class="close-button"/>
 			<div class="stripe"></div>
 			<div class="z-index-PL">PL *</div>
-			<input type="text" class="PL-input" id="PL" v-model="newVerb.verbInPolish">
-			<div class="z-index-infinitive">Infinitive</div>
-			<input type="text" class="infinitive-input" id="infinitive" v-model="newVerb.verbInInfinitive">
+			<input autocomplete="off" type="text" class="PL-input" v-model="newVerb.verbInPolish">
+			<div class="z-index-infinitive">Infinitive *</div>
+			<input autocomplete="off" type="text" class="infinitive-input" v-model="newVerb.verbInInfinitive">
 			<div class="clearfix"></div>
 			<div class="z-index-simple1">Past Simple *</div>
-			<input type="text" class="past-simple-1-input" id="pastSimple1" v-model="newVerb.verbInPastSimple1">
+			<input autocomplete="off" type="text" class="past-simple-1-input" v-model="newVerb.verbInPastSimple1">
 			<div class="z-index-simple2">Past Simple</div>
-			<input type="text" class="past-simple-2-input" id="pastSimple2" v-model="newVerb.verbInPastSimple2">
+			<input autocomplete="off" type="text" class="past-simple-2-input" v-model="newVerb.verbInPastSimple2">
 			<div class="clearfix"></div>
 			<div class="z-index-participle1">Past Participle *</div>
-			<input type="text" class="past-participle-1-input" id="pastParticiple1" v-model="newVerb.verbInPastParticiple1">
+			<input autocomplete="off" type="text" class="past-participle-1-input" v-model="newVerb.verbInPastParticiple1">
 			<div class="z-index-participle2">Past Participle</div>
-			<input type="text" class="past-participle-2-input" id="pastParticiple2" v-model="newVerb.verbInPastParticiple2">
+			<input autocomplete="off" type="text" class="past-participle-2-input" v-model="newVerb.verbInPastParticiple2">
 			<div class="z-index-description">PL Dodatkowy Opis</div>
-			<textarea name="groupAdditional" rows="2" class="form-control" id="additionalDescription" v-model="newVerb.additionalDescription"></textarea>
+			<textarea name="groupAdditional" class="additional-description" v-model="newVerb.additionalDescription"></textarea>
 			<div class="clearfix"></div>
-			<img src="images/cross.png" alt="dasd">
-			<button @click="addVerbPopUp = false" class="close-button">zamknij</button>
 			<button @click="saveVerb()" class="save-button">DODAJ</button>
+			<div class="announcement"> {{ announcement }}</div>
 		</div>
 		<div class="clearfix"></div>
-			<div class="verb-list" v-for="verb in verbsObject">
+		<div class="verb-list" v-for="verb in verbsObject">
 				<div class="verbs-list">
 					{{ verb.verbInInfinitive }} -
 					{{ verb.verbInPastSimple1 }} -
@@ -55,8 +56,6 @@ require_once 'header.php';
 				<div class="edit">edytuj</div>
 				<div class="clearfix"></div>
 			</div>
-			<div class="announcement"></div>
-			{{ announcement }}
 	</div>
 </div>
 
@@ -82,23 +81,30 @@ createApp({
 	methods: {
 		saveVerb() {
 			let app = this;
-			axios.post('Verbs/saveVerbs',
-
+			axios.post('Verb_list/saveVerbs',
 				{newVerb: this.newVerb}, {
 					headers: {
 						'Content-Type': 'multipart/form-data'
 					}
 				})
 				.then(function (response) {
+					console.log(response.data.verbs);
 					if (response.data.result) {
-						app.verbsObject = {};
-						app.announcement = 'Udało się';
-						app.addVerbPopUp = false;
+						app.verbsObject = {};  // po co to
+						app.announcement = 'Dodano do bazy';
 						app.verbsObject = response.data.verbs;
+						app.newVerb = {
+								verbInPolish: '',
+								verbInInfinitive: '',
+								verbInPastSimple1: '',
+								verbInPastSimple2: '',
+								verbInPastParticiple1: '',
+								verbInPastParticiple2: '',
+								additionalDescription: ''
+						};
 					} else {
-						app.announcement = 'Nie udało się';
+						app.announcement = 'Nie dodano do bazy';
 					}
-					console.log(response.data);
 				})
 				.catch(function (error) {
 					console.log(error);
