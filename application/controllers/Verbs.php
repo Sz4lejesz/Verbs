@@ -9,7 +9,7 @@ class Verbs extends CI_Controller
     }
     public function saveVerbs()
     {
-        $this->load->model('Verbs_model', 'Model');
+        $this->load->model('Verbs_repository', 'Model');
         $result = $this->Model->saveVerb($_POST['newVerb']);
         $verbs =  $this->getVerbsFromDB();
         $data = [
@@ -20,7 +20,7 @@ class Verbs extends CI_Controller
     }
     private function getVerbsFromDB()
     {
-        $this->load->model('Verbs_model', 'Model');
+        $this->load->model('Verbs_repository', 'Model');
         return $this->Model->getVerbs();
     }
 }

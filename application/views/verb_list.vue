@@ -3,6 +3,7 @@ require_once 'header.php';
 ?>
 
 <div id="app">
+{{ filter }}
 	<div class="box">
 		<div class="menu">
 			<div class="learning" id="learning">nauka</div>
@@ -15,13 +16,12 @@ require_once 'header.php';
 		<div class="new-verb-button">
 			<div class="all-verbs">Wszystkie czasowniki</div>
 			<div class="new" @click="addVerbPopUp = true">NOWY</div>
-			<input autocomplete="off" type="text" class="searching-input" placeholder="czego szukamy?">
+			<input autocomplete="off" type="text" class="searching-input" v-model="filter" placeholder="czego szukamy?">
 		</div>
 		<div class="overlay" v-if="addVerbPopUp"></div>
 		<div class="clearfix"></div>
 		<div class="add-verb" v-if="addVerbPopUp">
 			<div class="new-verb">Nowy czasownik</div>
-<!--			<button @click="addVerbPopUp = false" class="close-button">zamknij</button>-->
 			<img src="content/images/cross.png" height="22" width="20" @click="addVerbPopUp = false" class="close-button"/>
 			<div class="stripe"></div>
 			<div class="z-index-PL">PL *</div>
@@ -45,7 +45,7 @@ require_once 'header.php';
 			<div class="announcement"> {{ announcement }}</div>
 		</div>
 		<div class="clearfix"></div>
-		<div class="verb-list" v-for="verb in verbsObject">
+		<div class="verb-list" v-for="verb in verbsFilter">
 				<div class="verbs-list">
 					{{ verb.verbInInfinitive }} -
 					{{ verb.verbInPastSimple1 }} -
@@ -58,13 +58,13 @@ require_once 'header.php';
 			</div>
 	</div>
 </div>
-
 <script>
 const { createApp } = Vue
 createApp({
 	data() {
 		return {
-			addVerbPopUp: true,
+			filter: '',
+			addVerbPopUp: false,
 			announcement: '',
 			verbsObject: {},
 			newVerb: {
@@ -88,7 +88,6 @@ createApp({
 					}
 				})
 				.then(function (response) {
-					console.log(response.data.verbs);
 					if (response.data.result) {
 						app.verbsObject = {};  // po co to
 						app.announcement = 'Dodano do bazy';
@@ -110,7 +109,8 @@ createApp({
 					console.log(error);
 				});
 		},
-		showVerbs() {
+		showVerbs()
+		{
 			let app = this;
 			axios.post('Verb_list/showVerbs',
 
@@ -132,6 +132,18 @@ createApp({
 	},
 	created() {
 		this.showVerbs();
+	},
+	computed: {
+		verbsFilter: function()
+		{
+			return this.verbsObject.filter((verb) => {
+				let vII = verb.verbInInfinitive.toLowerCase().match(this.filter.toLowerCase());
+				let vIPS1 = verb.verbInPastSimple1.toLowerCase().match(this.filter.toLowerCase());
+				let vIPP1 = verb.verbInPastParticiple1.toLowerCase().match(this.filter.toLowerCase())
+				let vIP = verb.verbInPolish.toLowerCase().match(this.filter.toLowerCase());
+				return vII || vIPS1 || vIPP1 || vIP;
+			})
+		}
 	}
 
 }).mount('#app')

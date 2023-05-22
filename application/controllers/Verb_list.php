@@ -11,7 +11,7 @@ class Verb_list extends CI_Controller
     }
     public function saveVerbs()
     {
-        $this->load->model('Verbs_model', 'Model');
+        $this->load->model('Repository\VerbsRepository', 'Model');
         $form = $_POST['newVerb'];
         var_dump($_POST['newVerb']);
 
@@ -34,10 +34,24 @@ class Verb_list extends CI_Controller
     }
     private function getVerbsFromDB()
     {
-        $verb = new Verb();
-        $this->load->model('Verbs_model', 'Model');
-        v($this->Model->getVerbs());
-        return $this->Model->getVerbs();
+		/** @var $verb Verb */
+		$this->load->model('Repository\VerbsRepository', 'Model');
+		$result = $this->Model->getVerbs();
+		$verbs = [];
+		foreach ($result as $verb) {
+			$verbs[] = [
+				'id' => $verb->getId(),
+				'verbInPolish' => $verb->getVerbInPolish(),
+				'verbInInfinitive' => $verb->getVerbInInfinitive(),
+				'verbInPastSimple1' => $verb->getVerbInPastSimple1(),
+				'verbInPastSimple2' => $verb->getVerbInPastSimple2(),
+				'verbInPastParticiple1' => $verb->getVerbInPastParticiple1(),
+				'verbInPastParticiple2' => $verb->getVerbInPastParticiple2(),
+				'additionalDescription' => $verb->getAdditionalDescription()
+			];
+		}
+
+		return $verbs;
     }
     public function showVerbs()
     {
