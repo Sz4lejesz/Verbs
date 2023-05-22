@@ -1,6 +1,6 @@
 <?php
 
-use application\Model\Verb;
+//use application\Model\Verb;
 
 class Verbs_model extends \CI_Model
 {
@@ -24,11 +24,11 @@ class Verbs_model extends \CI_Model
         $query = "SELECT * FROM `verbs`";
         $getVerbs = $this->db->query($query);
         $result = $getVerbs->result_array();
-        foreach ($result as $row) {
-            $verb = new Verb();
-			v($verb);
-            v($row['date']);
-        }
+//        foreach ($result as $row) {
+//            $verb = new Verb();
+//			v($verb);
+//            v($row['date']);
+//        }
         return $result;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use application\Model\Verb;
+
 defined('BASEPATH') or exit('No direct script access allowed');
 class Verb_list extends CI_Controller
 {
@@ -32,9 +34,9 @@ class Verb_list extends CI_Controller
     }
     private function getVerbsFromDB()
     {
-		$verb = new \application\Model\Verb();
+        $verb = new Verb();
         $this->load->model('Verbs_model', 'Model');
-		v( $this->Model->getVerbs());
+        v($this->Model->getVerbs());
         return $this->Model->getVerbs();
     }
     public function showVerbs()
