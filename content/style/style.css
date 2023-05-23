@@ -55,12 +55,13 @@ body {
 	float: left;
 	color: rgba(110,110,110,255);
 	padding: 20px 40px 20px 50px;
+	cursor: pointer;
 }
 .verbs {
 	float: left;
 	color: rgba(110,110,110,255);
 	padding: 20px 40px 20px 0;
-
+	cursor: pointer;
 }
 .words {
 	float: left;
@@ -279,4 +280,139 @@ textarea {
 	float: left;
 	margin-top: 50px;
 }
-
+.randomized-verb {
+	float: left;
+	font-size: 36px;
+	margin-bottom: 30px;
+	margin-top: 20px;
+}
+.settings {
+	float: right;
+	color: white;
+	cursor: pointer;
+	margin-top: 25px;
+}
+.learning-infinitive-input{
+	width: 260px;
+	height: 37px;
+	border: 1px solid rgba(191,191,191,255);
+	border-radius: 5px;
+	margin: 25px 0 25px 0;
+	padding-left: 10px;
+	font-size: 15px;
+	display: flex;
+	align-items: center;
+	justify-content: left;
+	float: left;
+}
+.learning-past-simple-input {
+	width: 260px;
+	height: 37px;
+	border: 1px solid rgba(191,191,191,255);
+	border-radius: 5px;
+	margin: 25px 39px 25px 39px;
+	padding-left: 10px;
+	font-size: 15px;
+	display: flex;
+	align-items: center;
+	justify-content: left;
+	float: left;
+}
+.learning-stripe {
+	width: 100%;
+	border-bottom: 1px solid rgba(191,191,191,255);
+}
+.learning-infinitive-z-index {
+	z-index: 2;
+	padding: 0 10px;
+	background: white;
+	position: absolute;
+	font-size: 13px;
+	top: 304px;
+	left: 448px;
+}
+.learning-past-simple-z-index {
+	z-index: 2;
+	padding: 0 10px;
+	background: white;
+	position: absolute;
+	font-size: 13px;
+	top: 304px;
+	left: 762px;
+}
+.learning-past-participle-z-index {
+	z-index: 2;
+	padding: 0 10px;
+	background: white;
+	position: absolute;
+	font-size: 13px;
+	top: 304px;
+	left: 1075px;
+}
+.check-button {
+	float: left;
+	background: rgba(200,111,146,255);
+	color: white;
+	height: 37px;
+	width: 137px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: 15px;
+	font-size: 15px;
+	cursor: pointer;
+}
+.check-image {
+	z-index: 2;
+	position: absolute;
+	top: 410px;
+	left: 468px;
+	cursor: pointer;
+}
+.learning-button {
+	float: left;
+	margin-left: 5px;
+	background: rgba(123,206,180,255);
+	height: 37px;
+	width: 123px;
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: 15px;
+	cursor: pointer;
+}
+.learning-image {
+	z-index: 2;
+	position: absolute;
+	top: 408px;
+	left: 605px;
+	cursor: pointer;
+}
+.new-image{
+	z-index: 2;
+	position: absolute;
+	top: 408px;
+	left: 738px;
+	cursor: pointer;
+}
+.add-to-group-button {
+	float: right;
+	height: 37px;
+	width: 173px;
+	background: rgba(123,206,180,255);
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: 15px;
+	cursor: pointer;
+	font-size: 16px;
+}
+.add-to-group-image {
+	z-index: 2;
+	position: absolute;
+	top: 410px;
+	left: 1191px;
+	cursor: pointer;
+}

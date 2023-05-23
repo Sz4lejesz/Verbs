@@ -13,8 +13,6 @@ class Verb_list extends CI_Controller
     {
         $this->load->model('Repository\VerbsRepository', 'Model');
         $form = $_POST['newVerb'];
-        var_dump($_POST['newVerb']);
-
         if (
             !(
             $form['verbInPolish'] === '' ||

@@ -3,10 +3,9 @@ require_once 'header.php';
 ?>
 
 <div id="app">
-{{ filter }}
 	<div class="box">
 		<div class="menu">
-			<div class="learning" id="learning">nauka</div>
+			<div class="learning" @click="goToLearning">nauka</div>
 			<div class="verbs">czasowniki</div>
 			<div class="words">słowa</div>
 			<div class="groups">grupy</div>
@@ -108,6 +107,10 @@ createApp({
 				.catch(function (error) {
 					console.log(error);
 				});
+		},
+		goToLearning()
+		{
+			window.location.href = "http://localhost/verbs/learning"
 		},
 		showVerbs()
 		{
