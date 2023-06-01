@@ -115,13 +115,7 @@ createApp({
 		showVerbs()
 		{
 			let app = this;
-			axios.post('Verb_list/showVerbs',
-
-				{newVerb: this.newVerb}, {
-					headers: {
-						'Content-Type': 'multipart/form-data'
-					}
-				})
+			axios.get('Verb_list/showVerbs')
 				.then(function (response) {
 					if (response.data.verbs) {
 						app.verbsObject = {};

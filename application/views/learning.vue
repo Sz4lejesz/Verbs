@@ -12,121 +12,168 @@ require_once 'header.php';
 			<div class="name">Marcin</div>
 		</div>
 		<div class="clearfix"></div>
-		<div class="randomized-verb">Robić</div>
-		<img src="content/images/settings.png" height="21" width="21" class="settings" @click="addVerbPopUp = true"/>
+		<div class="randomized-verb" v-if="verbInPolishMODE">{{ x.main }}</div>
+		<div class="randomized-verb" v-if="verbInInfinitiveMODE">{{ verbInInfinitive }}</div>
+		<div class="randomized-verb" v-if="verbInPastSimpleMODE">{{ verbInPastSimple }}</div>
+		<div class="randomized-verb" v-if="verbInPastParticipleMODE">{{ verbInPastParticiple }}</div>
+		<img src="content/images/settings.png" height="21" width="21" class="settings" @click="settingsPopUp = true"/>
 		<div class="clearfix"></div>
 		<div class="learning-stripe"></div>
 		<div class="learning-inputs-box">
-			<div class="learning-infinitive-z-index">Infitive</div>
-			<input type="text" class="learning-infinitive-input" v-model="Infinitive">
-			<div class="learning-past-simple-z-index">Past Simple</div>
-			<input type="text" class="learning-past-simple-input" v-model="Infinitive">
-			<div class="learning-past-participle-z-index">Past Participle</div>
-			<input type="text" class="learning-infinitive-input" v-model="Infinitive">
+			<div class="" v-if="verbInPolishMODE">
+				<div class="learning-infinitive-z-index">Infitive</div>
+				<div class="learning-past-simple-z-index">Past Simple</div>
+				<div class="learning-past-participle-z-index">Past Participle</div>
+				<input type="text" class="learning-infinitive-input" v-model="verbs.verbInInfinitive">
+				<input type="text" class="learning-past-simple-input" v-model="verbs.verbInPastSimple">
+				<input type="text" class="learning-infinitive-input" v-model="verbs.verbInPastParticiple">
+			</div>
+			<div class="" v-if="verbInPastSimpleMODE">
+				<div class="learning-infinitive-z-index">Po Polsku</div>
+				<div class="learning-past-simple-z-index">Infinitive</div>
+				<div class="learning-past-participle-z-index">Past Participle</div>
+				<input type="text" class="learning-infinitive-input" v-model="verbs.verbInPolish">
+				<input type="text" class="learning-past-simple-input" v-model="verbs.verbInInfinitive">
+				<input type="text" class="learning-infinitive-input" v-model="verbs.verbInPastParticiple">
+			</div>
+			<div class="" v-if="verbInInfinitiveMODE">
+				<div class="learning-infinitive-z-index">Po Polsku</div>
+				<div class="learning-past-simple-z-index">Past Simple</div>
+				<div class="learning-past-participle-z-index">Past Participle</div>
+				<input type="text" class="learning-infinitive-input" v-model="verbs.verbInPolish">
+				<input type="text" class="learning-past-simple-input" v-model="verbs.verbInPastSimple">
+				<input type="text" class="learning-infinitive-input" v-model="verbs.verbInPastParticiple">
+			</div>
+			<div class="" v-if="verbInPastParticipleMODE">
+				<div class="learning-infinitive-z-index">Po polsku</div>
+				<div class="learning-past-simple-z-index">Infinitive</div>
+				<div class="learning-past-participle-z-index">Past Simple</div>
+				<input type="text" class="learning-infinitive-input" v-model="verbs.verbInPolish">
+				<input type="text" class="learning-past-simple-input" v-model="verbs.verbInInfinitive">
+				<input type="text" class="learning-infinitive-input" v-model="verbs.verbInPastSimple">
+			</div>
+
+		</div>
+		<div class="overlay" v-if="settingsPopUp"></div>
+		<div class="clearfix"></div>
+		<div class="learning-settings" v-if="settingsPopUp">
+			<div class="learning-row">Pytanie o czasownik</div>
+			<select @change="verbFormChange($event)" class="custom-select">
+				<option value="verbInPolish" selected="selected" v-model="">PL</option>
+				<option value="verbInInfinitive">EN Infinitive</option>
+				<option value="verbInPastSimple1">EN Past simple</option>
+				<option value="verbInPastParticiple1">EN Past participle</option>
+				<option value="5">Losowo</option>
+			</select>
+			<div class="clearfix"></div>
+			<div class="learning-stripe"></div>
+			<div class="learning-row">Nie wyświetlaj tych które już umiem</div>
+			<input type="checkbox" id="switch"/><label for="switch"></label>
+			<div class="clearfix"></div>
+			<div class="learning-stripe"></div>
+			<div class="learning-row">Używać pełnej listy czasowników?</div>
+			<input2 type="checkbox" id="switch2" /><label2 for="switch2"></label2>
+			<div class="clearfix"></div>
+			<div class="learning-stripe"></div>
+			<div class="apply-settings float-right" @click="settingsPopUp = false, drawVerb()" >Zastosuj</div>
 		</div>
 		<div class="clearfix"></div>
 		<div class="learning-stripe"></div>
-		<img src="content/images/check.png" height="16" width="19" class="check-image"/>
-		<div class="check-button">&nbsp&nbsp&nbsp&nbsp&nbspSprawdź</div>
-		<img src="content/images/learning.png" height="19" width="23" class="learning-image"/>
-		<div class="learning-button">&nbsp&nbsp&nbsp&nbspNauka</div>
-		<img src="content/images/new.png" height="19" width="20" class="new-image"/>
-		<div class="learning-button">&nbsp&nbsp&nbsp&nbspNowy</div>
-		<img src="content/images/add-to-group.png" height="17" width="17" class="add-to-group-image"/>
-		<div class="add-to-group-button">&nbsp&nbsp&nbsp&nbsp&nbspDodaj do grupy</div>
-		<div class="overlay" v-if="addVerbPopUp"></div>
+		<div class="check-button" @click="checkTranslation()" >🤔&nbspSprawdź</div>
+		<div class="learning-button" @click="learningPopUp = !learningPopUp">🤓&nbspNauka</div>
+		<div class="learning-button" @click="drawVerb()">🙀&nbspNowy</div>
+		<div class="add-to-group-button">✔️&nbspDodaj do grupy</div>
 		<div class="clearfix"></div>
-		<div class="add-verb" v-if="addVerbPopUp">
-		DODATKOWE USTAWIENIA
-		<img src="content/images/cross.png" height="22" width="20" @click="addVerbPopUp = false" class="close-button"/>
+		<div class="learning-announcement">{{ announcement }}</div>
+		<div class="correct-results-box" v-if="learningPopUp">
+			<div class="overlay" v-if="settingsPopUp"></div>
+			<div class="learning-stripe mt-15"></div>
+			<div class="clearfix"></div>
+			<div class="mt-15">Poprawne odpowiedzi:</div>
+			<div class="correct-results">{{ verbInPolish }} - {{ verbInInfinitive }} - {{ verbInPastSimple }} - {{ verbInPastParticiple }}</div>
 		</div>
 	</div>
+	{{x.main}}
+	{{x.choosen}}
 </div>
 <script>
 const { createApp } = Vue
 createApp({
 	data() {
 		return {
-			addVerbPopUp: false,
+			verbInPolishMODE: true,
+			verbInPastParticipleMODE: false,
+			verbInPastSimpleMODE: false,
+			verbInInfinitiveMODE: false,
+			settingsPopUp: false,
+			learningPopUp: false,
 			announcement: '',
-			verbsObject: {},
-			newVerb: {
+			verbInInfinitive: '',
+			verbInPastSimple: '',
+			verbInPastParticiple: '',
+			verbInPolish: '',
+			verbs: {
+				verbInPolish: '',
 				verbInInfinitive: '',
 				verbInPastSimple: '',
-				verbInPastParticiple1: ''
+				verbInPastParticiple: ''
 			},
+			x: {
+				main: null,
+				choosen: 'verbInPolish'
+			}
 		}
 	},
 	methods: {
-		saveVerb() {
-			let app = this;
-			axios.post('Learning/saveVerbs',
-				{newVerb: this.newVerb}, {
-					headers: {
-						'Content-Type': 'multipart/form-data'
-					}
-				})
-				.then(function (response) {
-					if (response.data.result) {
-						app.verbsObject = {};  // po co to
-						app.announcement = 'Dodano do bazy';
-						app.verbsObject = response.data.verbs;
-						app.newVerb = {
-							verbInPolish: '',
-							verbInInfinitive: '',
-							verbInPastSimple1: '',
-							verbInPastSimple2: '',
-							verbInPastParticiple1: '',
-							verbInPastParticiple2: '',
-							additionalDescription: ''
-						};
-					} else {
-						app.announcement = 'Nie dodano do bazy';
-					}
-				})
-				.catch(function (error) {
-					console.log(error);
-				});
-		},
 		goToVerbs()
 		{
 			window.location = 'http://localhost/verbs/verb_list'
 		},
-		showVerbs()
+		drawVerb()
 		{
 			let app = this;
-			axios.post('Learning/showVerbs',
-
-				{newVerb: this.newVerb}, {
-					headers: {
-						'Content-Type': 'multipart/form-data'
-					}
-				})
+			axios.get('Learning/drawVerbs')
 				.then(function (response) {
-					if (response.data.verbs) {
-						app.verbsObject = {};
-						app.verbsObject = response.data.verbs;
+					if (response.data) {
+						app.verbInPolish = response.data.verbInPolish;
+						app.verbInInfinitive = response.data.verbInInfinitive;
+						app.verbInPastSimple = response.data.verbInPastSimple;
+						app.verbInPastParticiple = response.data.verbInPastParticiple;
+						app.verbs.verbInPolish = response.data.verbInPolish;
+						app.x.main = response.data[app.x.choosen];
 					}
 				})
 				.catch(function (error) {
 					console.log(error);
 				});
+		},
+		checkTranslation()
+		{
+			let app = this;
+			axios.post('Learning/checkTranslation',
+				{verbs: this.verbs, x: this.x}, {
+					headers: {
+						'Content-Type': 'multipart/form-data'
+					}
+				})
+				.then(function (response) {
+					if (response.data) {
+						app.announcement = response.data;
+					}
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
+		},
+		verbFormChange(e)
+		{
+			this.x.choosen = e.srcElement.value
 		}
 	},
 	created() {
-		this.showVerbs();
+		this.drawVerb();
 	},
 	computed: {
-		verbsFilter: function()
-		{
-			return this.verbsObject.filter((verb) => {
-				let vII = verb.verbInInfinitive.toLowerCase().match(this.filter.toLowerCase());
-				let vIPS1 = verb.verbInPastSimple1.toLowerCase().match(this.filter.toLowerCase());
-				let vIPP1 = verb.verbInPastParticiple1.toLowerCase().match(this.filter.toLowerCase())
-				let vIP = verb.verbInPolish.toLowerCase().match(this.filter.toLowerCase());
-				return vII || vIPS1 || vIPP1 || vIP;
-			})
-		}
 	}
 
 }).mount('#app')

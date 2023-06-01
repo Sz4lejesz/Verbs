@@ -11,8 +11,9 @@
 		"source": "https://github.com/bcit-ci/CodeIgniter"
 	},
 	"require": {
-		"php": ">=8.2"
-	},
+		"php": ">=8.2",
+      "ext-pdo": "*"
+    },
 	"suggest": {
 		"paragonie/random_compat": "Provides better randomness in PHP 5.x"
 	},

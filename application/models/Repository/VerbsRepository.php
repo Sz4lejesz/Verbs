@@ -1,7 +1,6 @@
 <?php
 namespace Repository;
 use application\Model\Verb;
-
 class VerbsRepository extends \CI_Model
 {
 	public function saveVerb($form)
@@ -17,7 +16,24 @@ class VerbsRepository extends \CI_Model
 		$query = "INSERT INTO `verbs`(`verbInPolish`, `verbInInfinitive`, `verbInPastSimple1`, `verbInPastSimple2`,
       	 `verbInPastParticiple1`, `verbInPastParticiple2`, `additionalDescription`) VALUES (?, ?, ?, ?, ?, ?, ?)";
 		$addVerb = $this->db->query($query, $params);
+
 		return $addVerb;
+	}
+	public function getVerbFromDBById($id)
+	{
+		$query = "SELECT * FROM `verbs` WHERE id = ?";
+		$result = $this->db->query($query, [$id])->result_array();
+		$verb = new Verb();
+		$verb
+			->setId($result[0]['id'])
+			->setVerbInPolish($result[0]['verbInPolish'])
+			->setVerbInInfinitive($result[0]['verbInInfinitive'])
+			->setVerbInPastSimple1($result[0]['verbInPastSimple1'])
+			->setVerbInPastSimple2($result[0]['verbInPastSimple2'])
+			->setVerbInPastParticiple1($result[0]['verbInPastParticiple1'])
+			->setVerbInPastParticiple2($result[0]['verbInPastParticiple2'])
+			->setAdditionalDescription($result[0]['additionalDescription']);
+		return $verb;
 	}
 
 	/**
@@ -40,8 +56,39 @@ class VerbsRepository extends \CI_Model
 				->setVerbInPastParticiple1($row['verbInPastParticiple1'])
 				->setVerbInPastParticiple2($row['verbInPastParticiple2'])
 				->setAdditionalDescription($row['additionalDescription']);
-
 		}
+
 		return $data;
+	}
+	public function getMinId()
+	{
+		$query = "SELECT MIN(id) AS min_id FROM `verbs`";
+
+		return $this->db->query($query)->row_array();
+	}
+	public function getMaxId()
+	{
+		$query = "SELECT MAX(id) AS max_id FROM `verbs`";
+
+		return $this->db->query($query)->row_array();
+	}
+	public function getVerbFromDB($viewVerb, $dbVerb)
+	{
+		$query = "SELECT * FROM verbs WHERE $dbVerb = ?";
+		$result = $this->db->query($query, array($viewVerb))->result_array();
+		v($result);
+		$verb = new Verb();
+		$verb
+			->setId($result[0]['id'])
+			->setVerbInInfinitive($result[0]['verbInInfinitive'])
+			->setVerbInPastSimple2($result[0]['verbInPastSimple2'])
+			->setVerbInPastParticiple2($result[0]['verbInPastParticiple2'])
+			->setAdditionalDescription($result[0]['additionalDescription'])
+			->setVerbInPolish($result[0]['verbInPolish'])
+			->setVerbInPastParticiple1($result[0]['verbInPastParticiple1'])
+			->setVerbInPastSimple1($result[0]['verbInPastSimple1']);
+
+
+		return $verb;
 	}
 }
