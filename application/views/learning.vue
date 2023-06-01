@@ -13,9 +13,9 @@ require_once 'header.php';
 		</div>
 		<div class="clearfix"></div>
 		<div class="randomized-verb" v-if="verbInPolishMODE">{{ x.main }}</div>
-		<div class="randomized-verb" v-if="verbInInfinitiveMODE">{{ verbInInfinitive }}</div>
-		<div class="randomized-verb" v-if="verbInPastSimpleMODE">{{ verbInPastSimple }}</div>
-		<div class="randomized-verb" v-if="verbInPastParticipleMODE">{{ verbInPastParticiple }}</div>
+		<div class="randomized-verb" v-if="verbInInfinitiveMODE">{{ x.main }}</div>
+		<div class="randomized-verb" v-if="verbInPastSimpleMODE">{{ x.main }}</div>
+		<div class="randomized-verb" v-if="verbInPastParticipleMODE">{{ x.main }}</div>
 		<img src="content/images/settings.png" height="21" width="21" class="settings" @click="settingsPopUp = true"/>
 		<div class="clearfix"></div>
 		<div class="learning-stripe"></div>
@@ -72,7 +72,7 @@ require_once 'header.php';
 			<div class="clearfix"></div>
 			<div class="learning-stripe"></div>
 			<div class="learning-row">Używać pełnej listy czasowników?</div>
-			<input2 type="checkbox" id="switch2" /><label2 for="switch2"></label2>
+<!--			<input2 type="checkbox" id="switch2" /><label2 for="switch2"></label2>-->
 			<div class="clearfix"></div>
 			<div class="learning-stripe"></div>
 			<div class="apply-settings float-right" @click="settingsPopUp = false, drawVerb()" >Zastosuj</div>
@@ -93,8 +93,6 @@ require_once 'header.php';
 			<div class="correct-results">{{ verbInPolish }} - {{ verbInInfinitive }} - {{ verbInPastSimple }} - {{ verbInPastParticiple }}</div>
 		</div>
 	</div>
-	{{x.main}}
-	{{x.choosen}}
 </div>
 <script>
 const { createApp } = Vue
@@ -137,9 +135,46 @@ createApp({
 					if (response.data) {
 						app.verbInPolish = response.data.verbInPolish;
 						app.verbInInfinitive = response.data.verbInInfinitive;
-						app.verbInPastSimple = response.data.verbInPastSimple;
-						app.verbInPastParticiple = response.data.verbInPastParticiple;
-						app.verbs.verbInPolish = response.data.verbInPolish;
+						app.verbInPastSimple = response.data.verbInPastSimple1;
+						app.verbInPastParticiple = response.data.verbInPastParticiple1;
+						switch (app.x.choosen) {
+							case 'verbInInfinitive':
+								app.verbs.verbInInfinitive = response.data.verbInInfinitive;
+								if (app.announcement === 'Wszystko ok!') {
+									app.verbs.verbInPolish = '';
+									app.verbs.verbInPastSimple = '';
+									app.verbs.verbInPastParticiple = '';
+									app.announcement = '';
+								}
+								break
+							case 'verbInPolish':
+								app.verbs.verbInPolish = response.data.verbInPolish;
+								if (app.announcement === 'Wszystko ok!') {
+									app.verbs.verbInInfinitive = '';
+									app.verbs.verbInPastSimple = '';
+									app.verbs.verbInPastParticiple = '';
+									app.announcement = '';
+								}
+								break
+							case 'verbInPastSimple1':
+								app.verbs.verbInPastSimple = response.data.verbInPastSimple1
+								if (app.announcement === 'Wszystko ok!') {
+									app.verbs.verbInInfinitive = '';
+									app.verbs.verbInPolish = '';
+									app.verbs.verbInPastParticiple = '';
+									app.announcement = '';
+								}
+								break
+							case 'verbInPastParticiple1':
+								app.verbs.verbInPastParticiple = response.data.verbInPastParticiple1
+								if (app.announcement === 'Wszystko ok!') {
+									app.verbs.verbInInfinitive = '';
+									app.verbs.verbInPastSimple = '';
+									app.verbs.verbInPolish = '';
+									app.announcement = '';
+								}
+						}
+						console.log(app.announcement)
 						app.x.main = response.data[app.x.choosen];
 					}
 				})
@@ -160,6 +195,7 @@ createApp({
 					if (response.data) {
 						app.announcement = response.data;
 					}
+
 				})
 				.catch(function (error) {
 					console.log(error);
@@ -167,7 +203,33 @@ createApp({
 		},
 		verbFormChange(e)
 		{
+			let app = this;
 			this.x.choosen = e.srcElement.value
+			switch (this.x.choosen){
+				case 'verbInInfinitive':
+					this.verbInInfinitiveMODE = true;
+					this.verbInPolishMODE = false;
+					this.verbInPastParticipleMODE = false;
+					this.verbInPastSimpleMODE = false;
+					break;
+				case 'verbInPolish':
+					this.verbInInfinitiveMODE = false;
+					this.verbInPolishMODE = true;
+					this.verbInPastParticipleMODE = false;
+					this.verbInPastSimpleMODE = false;
+					break;
+				case 'verbInPastSimple1':
+					this.verbInInfinitiveMODE = false;
+					this.verbInPolishMODE = false;
+					this.verbInPastParticipleMODE = false;
+					this.verbInPastSimpleMODE = true;
+					break;
+				case 'verbInPastParticiple1':
+					this.verbInInfinitiveMODE = false;
+					this.verbInPolishMODE = false;
+					this.verbInPastParticipleMODE = true;
+					this.verbInPastSimpleMODE = false;
+			}
 		}
 	},
 	created() {

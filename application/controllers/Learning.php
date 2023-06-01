@@ -20,10 +20,10 @@ class Learning extends CI_Controller
 		/** @var Verb $verb */
 		if ($randomID === $verb->getId()) {
 			$verbs = [
-				'verbInPolish' => $verb->getVerbInPolish(),
-				'verbInInfinitive' => $verb->getVerbInInfinitive(),
-				'verbInPastSimple1' => $verb->getVerbInPastSimple1(),
-				'verbInPastParticiple1' => $verb->getVerbInPastParticiple1()
+				'verbInPolish' => ucfirst($verb->getVerbInPolish()),
+				'verbInInfinitive' => ucfirst($verb->getVerbInInfinitive()),
+				'verbInPastSimple1' => ucfirst($verb->getVerbInPastSimple1()),
+				'verbInPastParticiple1' => ucfirst($verb->getVerbInPastParticiple1())
 			];
 		}
 		echo json_encode($verbs, JSON_UNESCAPED_UNICODE);

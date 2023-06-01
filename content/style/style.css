@@ -307,6 +307,7 @@ textarea {
 	align-items: center;
 	justify-content: left;
 	float: left;
+	text-transform: capitalize;
 }
 .learning-past-simple-input {
 	width: 258px;
@@ -320,6 +321,7 @@ textarea {
 	align-items: center;
 	justify-content: left;
 	float: left;
+	text-transform: capitalize;
 }
 .learning-stripe {
 	width: 100%;

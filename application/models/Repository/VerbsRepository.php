@@ -76,7 +76,6 @@ class VerbsRepository extends \CI_Model
 	{
 		$query = "SELECT * FROM verbs WHERE $dbVerb = ?";
 		$result = $this->db->query($query, array($viewVerb))->result_array();
-		v($result);
 		$verb = new Verb();
 		$verb
 			->setId($result[0]['id'])
