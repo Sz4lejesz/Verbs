@@ -68,7 +68,7 @@ require_once 'header.php';
 			<div class="clearfix"></div>
 			<div class="learning-stripe"></div>
 			<div class="learning-row">Nie wyświetlaj tych które już umiem</div>
-			<input type="checkbox" id="switch"/><label for="switch"></label>
+			<input type="checkbox" @click="showMistakesBox = !showMistakesBox" id="switch"/><label for="switch"></label>
 			<div class="clearfix"></div>
 			<div class="learning-stripe"></div>
 			<div class="learning-row">Używać pełnej listy czasowników?</div>
@@ -93,12 +93,41 @@ require_once 'header.php';
 			<div class="correct-results">{{ verbInPolish }} - {{ verbInInfinitive }} - {{ verbInPastSimple }} - {{ verbInPastParticiple }}</div>
 		</div>
 	</div>
+	<div class="mistakes-box" v-if="showMistakesBox">
+		<div class="left-to-learn">
+			<div class="left">Pozostało</div>
+			<div class="left-number">{{ verbsLeftToLearn }}</div>
+		</div>
+		<div class="left-to-learn">
+			<div class="left">Umiesz już</div>
+			<div class="left-number">{{ learntVerbs }}</div>
+		</div>
+		<div class="info-box">
+			<div class="float-left">Lista poznanych czasowników</div>
+			<div class="float-right">Ilość błędów: {{ mistakes }}</div>
+			<div class="clearfix"></div>
+			<div class="mistakes-stripe"></div>
+			<div class="font-weight-bold" v-for="verb in learnedVerbsArray">
+				{{verb.verbInInfinitive}} -
+				{{verb.verbInPastSimple}} -
+				{{verb.verbInPastParticiple}} ⟶
+				{{verb.verbInPolish}}
+			</div>
+		</div>
+		<div class="clearfix"></div>
+	</div>
 </div>
 <script>
 const { createApp } = Vue
 createApp({
 	data() {
 		return {
+			i: 0,
+			learnedVerbsArray: [],
+			verbsLeftToLearn: 0,
+			learntVerbs: 0,
+			mistakes: 0,
+			showMistakesBox: true,
 			verbInPolishMODE: true,
 			verbInPastParticipleMODE: false,
 			verbInPastSimpleMODE: false,
@@ -119,64 +148,65 @@ createApp({
 			x: {
 				main: null,
 				choosen: 'verbInPolish'
-			}
+			},
+			allVerbsObject: {
+
+			},
 		}
 	},
 	methods: {
-		goToVerbs()
-		{
+		goToVerbs() {
 			window.location = 'http://localhost/verbs/verb_list'
 		},
-		drawVerb()
-		{
+		drawVerb() {
 			let app = this;
-			axios.get('Learning/drawVerbs')
-				.then(function (response) {
-					if (response.data) {
-						app.verbInPolish = response.data.verbInPolish;
-						app.verbInInfinitive = response.data.verbInInfinitive;
-						app.verbInPastSimple = response.data.verbInPastSimple1;
-						app.verbInPastParticiple = response.data.verbInPastParticiple1;
-						switch (app.x.choosen) {
-							case 'verbInInfinitive':
-								app.verbs.verbInInfinitive = response.data.verbInInfinitive;
-								if (app.announcement === 'Wszystko ok!') {
-									app.verbs.verbInPolish = '';
-									app.verbs.verbInPastSimple = '';
-									app.verbs.verbInPastParticiple = '';
-									app.announcement = '';
-								}
-								break
-							case 'verbInPolish':
-								app.verbs.verbInPolish = response.data.verbInPolish;
-								if (app.announcement === 'Wszystko ok!') {
-									app.verbs.verbInInfinitive = '';
-									app.verbs.verbInPastSimple = '';
-									app.verbs.verbInPastParticiple = '';
-									app.announcement = '';
-								}
-								break
-							case 'verbInPastSimple1':
-								app.verbs.verbInPastSimple = response.data.verbInPastSimple1
-								if (app.announcement === 'Wszystko ok!') {
-									app.verbs.verbInInfinitive = '';
-									app.verbs.verbInPolish = '';
-									app.verbs.verbInPastParticiple = '';
-									app.announcement = '';
-								}
-								break
-							case 'verbInPastParticiple1':
-								app.verbs.verbInPastParticiple = response.data.verbInPastParticiple1
-								if (app.announcement === 'Wszystko ok!') {
-									app.verbs.verbInInfinitive = '';
-									app.verbs.verbInPastSimple = '';
-									app.verbs.verbInPolish = '';
-									app.announcement = '';
-								}
-						}
-						console.log(app.announcement)
-						app.x.main = response.data[app.x.choosen];
+			axios.get('Learning/drawVerbs',
+				{verbs: this.learnedVerbsArray,}, {
+					headers: {
+						'Content-Type': 'multipart/form-data'
 					}
+				})
+				.then(function (response) {
+					console.log(response.data.verbInPolish)
+						if (response.data) {
+							if (app.allVerbsObject.hasOwnProperty(response.data.verbInPolish)) {
+								app.verbInPolish = response.data.verbInPolish;
+								app.verbInInfinitive = response.data.verbInInfinitive;
+								app.verbInPastSimple = response.data.verbInPastSimple1;
+								app.verbInPastParticiple = response.data.verbInPastParticiple1;
+								if (app.verbsLeftToLearn === 0) {
+									app.verbsLeftToLearn = response.data.amountOfVerbs;
+								}
+								if (app.announcement === 'Wszystko ok!') {
+									app.verbs.verbInInfinitive = '';
+									app.verbs.verbInPolish = '';
+									app.verbs.verbInPastSimple = '';
+									app.verbs.verbInPastParticiple = '';
+									app.announcement = '';
+								}
+								switch (app.x.choosen) {
+									case 'verbInInfinitive':
+										app.verbs.verbInInfinitive = response.data.verbInInfinitive;
+										break;
+									case 'verbInPolish':
+										app.verbs.verbInPolish = response.data.verbInPolish;
+										break;
+									case 'verbInPastSimple1':
+										app.verbs.verbInPastSimple = response.data.verbInPastSimple1;
+										break;
+									case 'verbInPastParticiple1':
+										app.verbs.verbInPastParticiple = response.data.verbInPastParticiple1;
+								}
+								app.x.main = response.data[app.x.choosen];
+							} else {
+								if (Object.keys(app.allVerbsObject).length === 0){
+
+									app.announcement = 'To już wszystkie czasowniki!'
+								} else {
+									app.drawVerb()
+								}
+							}
+						}
 				})
 				.catch(function (error) {
 					console.log(error);
@@ -193,7 +223,12 @@ createApp({
 				})
 				.then(function (response) {
 					if (response.data) {
-						app.announcement = response.data;
+						app.announcement = response.data.communicate;
+						app.mistakes = app.announcement === 'Błąd!' ? app.mistakes + 1 : app.mistakes;
+						app.announcement === 'Wszystko ok!' ? app.addVerbToLearned() : undefined;
+						// if (app.announcement === 'Wszystko ok!'){
+						// 	app.addVerbToLearned();
+						// }
 					}
 
 				})
@@ -203,36 +238,87 @@ createApp({
 		},
 		verbFormChange(e)
 		{
-			let app = this;
 			this.x.choosen = e.srcElement.value
-			switch (this.x.choosen){
+			this.verbInInfinitiveMODE = false;
+			this.verbInPolishMODE = false;
+			this.verbInPastParticipleMODE = false;
+			this.verbInPastSimpleMODE = false;
+			this.verbs.verbInPolish = null;
+			this.verbs.verbInInfinitive = null;
+			this.verbs.verbInPastSimple = null;
+			this.verbs.verbInPastParticiple = null;
+			switch (this.x.choosen) {
 				case 'verbInInfinitive':
 					this.verbInInfinitiveMODE = true;
-					this.verbInPolishMODE = false;
-					this.verbInPastParticipleMODE = false;
-					this.verbInPastSimpleMODE = false;
 					break;
 				case 'verbInPolish':
-					this.verbInInfinitiveMODE = false;
 					this.verbInPolishMODE = true;
-					this.verbInPastParticipleMODE = false;
-					this.verbInPastSimpleMODE = false;
 					break;
 				case 'verbInPastSimple1':
-					this.verbInInfinitiveMODE = false;
-					this.verbInPolishMODE = false;
-					this.verbInPastParticipleMODE = false;
 					this.verbInPastSimpleMODE = true;
 					break;
 				case 'verbInPastParticiple1':
-					this.verbInInfinitiveMODE = false;
-					this.verbInPolishMODE = false;
 					this.verbInPastParticipleMODE = true;
-					this.verbInPastSimpleMODE = false;
+					break;
+				case '5':
+					let random = Math.floor(Math.random() * 4) + 1;
+					switch (random) {
+						case 1:
+							this.verbInInfinitiveMODE = true;
+							this.x.choosen = 'verbInInfinitive';
+							break;
+						case 2:
+							this.verbInPolishMODE = true;
+							this.x.choosen = 'verbInPolish';
+							break;
+						case 3:
+							this.verbInPastSimpleMODE = true;
+							this.x.choosen = 'verbInPastSimple1';
+							break;
+						case 4:
+							this.verbInPastParticipleMODE = true;
+							this.x.choosen = 'verbInPastParticiple1';
+					}
 			}
+		},
+		addVerbToLearned()
+		{
+			let verb = {
+				'verbInPolish': this.verbs.verbInPolish,
+				'verbInInfinitive': this.verbs.verbInInfinitive,
+				'verbInPastParticiple': this.verbs.verbInPastParticiple,
+				'verbInPastSimple': this.verbs.verbInPastSimple
+			}
+			if (this.learnedVerbsArray[0] === undefined) {
+				this.learnedVerbsArray.push(verb);
+				delete this.allVerbsObject[this.verbInPolish];
+				this.verbsLeftToLearn--;
+				this.learntVerbs++;
+			}
+			if (this.learnedVerbsArray[this.i].verbInPolish !== this.verbs.verbInPolish) {
+				this.learnedVerbsArray.push(verb);
+				delete this.allVerbsObject[this.verbInPolish];
+				this.verbsLeftToLearn--;
+				this.learntVerbs++;
+				this.i++;
+			}
+		},
+		allVerbs()
+		{
+			let app = this;
+			axios.get('Learning/allVerbs')
+				.then(function (response) {
+					if (response.data) {
+						app.allVerbsObject = response.data;
+					}
+				})
+				.catch(function (error) {
+					console.log(error);
+				});
 		}
 	},
 	created() {
+		this.allVerbs();
 		this.drawVerb();
 	},
 	computed: {

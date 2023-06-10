@@ -10,20 +10,43 @@ class Learning extends CI_Controller
 	{
 		$this->load->view('learning.vue');
 	}
+	public function allVerbs()
+	{
+		$verbs = $this->getVerbsFromDB();
+		$verbsArray = [];
+		foreach ($verbs as $verb) {
+			$verbsArray[$verb['verbInPolish']] = $verb['verbInPolish'];
+		}
+		echo json_encode($verbsArray);
+	}
 	public function drawVerbs()
 	{
+//		$allVerbs = $this->allVerbs();
+//		if (isset($_POST['verb'])) {
+//			v($_POST);
+//			$frontVerbs = $_POST['verbs'];
+//			foreach ($allVerbs as $allVerb) {
+//				if ($allVerb === $frontVerbs) {
+//					echo 'hello';
+//				}
+//			}
+//		}
+//		v($allVerbs);
+//		v($verb->getVerbInPolish());
 		$this->load->model('Repository\VerbsRepository', 'Model');
 		$max = $this->Model->getMaxId()['max_id'];
 		$min = $this->Model->getMinId()['min_id'];
 		$randomID = rand($min, $max);
+		$amountOfVerbs = $this->howManyVerbs();
 		$verb = $this->Model->getVerbFromDBById($randomID);
 		/** @var Verb $verb */
 		if ($randomID === $verb->getId()) {
 			$verbs = [
-				'verbInPolish' => ucfirst($verb->getVerbInPolish()),
-				'verbInInfinitive' => ucfirst($verb->getVerbInInfinitive()),
-				'verbInPastSimple1' => ucfirst($verb->getVerbInPastSimple1()),
-				'verbInPastParticiple1' => ucfirst($verb->getVerbInPastParticiple1())
+				'verbInPolish' => $verb->getVerbInPolish(),
+				'verbInInfinitive' => $verb->getVerbInInfinitive(),
+				'verbInPastSimple1' => $verb->getVerbInPastSimple1(),
+				'verbInPastParticiple1' => $verb->getVerbInPastParticiple1(),
+				'amountOfVerbs' => $amountOfVerbs
 			];
 		}
 		echo json_encode($verbs, JSON_UNESCAPED_UNICODE);
@@ -34,16 +57,38 @@ class Learning extends CI_Controller
 		$x = $_POST['x'];
 		/** @var Verb $verb */
 		$verb = $this->getVerbFromDB($x['main'], $x['choosen']);
+		//		v(trim(strtoupper($form['verbInInfinitive'])));
+//		v(trim(strtoupper($verb->getVerbInInfinitive())));
+//		v(trim(strtoupper($form['verbInPastSimple'])));
+//		v(trim(strtoupper($verb->getVerbInPastSimple1())));
+//		v(trim(strtoupper($form['verbInPastParticiple'])));
+//		v(trim(strtoupper($verb->getVerbInPastParticiple1())));
+//		v(trim(mb_strtoupper($form['verbInPolish'], 'UTF-8')));
+//		v(trim(mb_strtoupper($verb->getVerbInPolish(), 'UTF-8')));
 		if (
-			trim(lcfirst($form['verbInInfinitive'])) === trim(lcfirst($verb->getVerbInInfinitive())) &
-			trim(lcfirst($form['verbInPastSimple'])) === trim(lcfirst($verb->getVerbInPastSimple1())) &
-			trim(lcfirst($form['verbInPastParticiple'])) === trim(lcfirst($verb->getVerbInPastParticiple1())) &
-			trim(lcfirst($form['verbInPolish'])) === trim(lcfirst($verb->getVerbInPolish()))
+//			trim(strtoupper($form['verbInInfinitive'])) === trim(strtoupper($verb->getVerbInInfinitive())) &
+//			trim(strtoupper($form['verbInPastSimple'])) === trim(strtoupper($verb->getVerbInPastSimple1())) &
+//			trim(strtoupper($form['verbInPastParticiple'])) === trim(strtoupper($verb->getVerbInPastParticiple1())) &
+			trim(mb_strtoupper($form['verbInPolish'], 'UTF-8')) === trim(mb_strtoupper($verb->getVerbInPolish(), 'UTF-8'))
 		) {
-			echo 'Wszystko ok!';
+			$data = [
+				'communicate' => 'Wszystko ok!'
+			];
 		} else {
-			echo 'Błąd!';
+			$data = [
+				'communicate' => 'Błąd!'
+			];
 		}
+		echo json_encode($data);
+	}
+	private function howManyVerbs()
+	{
+		$result = $this->getVerbsFromDB();
+		$i = 0;
+		foreach ($result as $row) {
+			$i++;
+		}
+		return $i;
 	}
 	private function getVerbsFromDB()
 	{
