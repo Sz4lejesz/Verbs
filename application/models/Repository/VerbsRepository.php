@@ -19,10 +19,10 @@ class VerbsRepository extends \CI_Model
 
 		return $addVerb;
 	}
-	public function getVerbFromDBById($id)
+	public function getVerbFromDBByIds(array $ids)
 	{
-		$query = "SELECT * FROM `verbs` WHERE id = ?";
-		$result = $this->db->query($query, [$id])->result_array();
+		$query = "SELECT * FROM `verbs` WHERE id NOT IN ?";
+		$result = $this->db->query($query, [$ids])->result_array();
 		$verb = new Verb();
 		$verb
 			->setId($result[0]['id'])
@@ -59,18 +59,6 @@ class VerbsRepository extends \CI_Model
 		}
 
 		return $data;
-	}
-	public function getMinId()
-	{
-		$query = "SELECT MIN(id) AS min_id FROM `verbs`";
-
-		return $this->db->query($query)->row_array();
-	}
-	public function getMaxId()
-	{
-		$query = "SELECT MAX(id) AS max_id FROM `verbs`";
-
-		return $this->db->query($query)->row_array();
 	}
 	public function getVerbFromDB($viewVerb, $dbVerb)
 	{

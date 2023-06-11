@@ -124,6 +124,7 @@ createApp({
 		return {
 			i: 0,
 			learnedVerbsArray: [],
+			learnedVerbsIds: [],
 			verbsLeftToLearn: 0,
 			learntVerbs: 0,
 			mistakes: 0,
@@ -160,20 +161,22 @@ createApp({
 		},
 		drawVerb() {
 			let app = this;
-			axios.get('Learning/drawVerbs',
-				{verbs: this.learnedVerbsArray,}, {
+			
+			axios.post('Learning/drawVerbs',
+				{ids: this.learnedVerbsIds}, {
 					headers: {
-						'Content-Type': 'multipart/form-data'
+						'Content-Type' : 'application/json',
 					}
 				})
 				.then(function (response) {
-					console.log(response.data.verbInPolish)
+					console.log(response.data)
 						if (response.data) {
 							if (app.allVerbsObject.hasOwnProperty(response.data.verbInPolish)) {
 								app.verbInPolish = response.data.verbInPolish;
 								app.verbInInfinitive = response.data.verbInInfinitive;
 								app.verbInPastSimple = response.data.verbInPastSimple1;
 								app.verbInPastParticiple = response.data.verbInPastParticiple1;
+								app.learnedVerbsIds.push(response.data.verbId);
 								if (app.verbsLeftToLearn === 0) {
 									app.verbsLeftToLearn = response.data.amountOfVerbs;
 								}
@@ -198,13 +201,6 @@ createApp({
 										app.verbs.verbInPastParticiple = response.data.verbInPastParticiple1;
 								}
 								app.x.main = response.data[app.x.choosen];
-							} else {
-								if (Object.keys(app.allVerbsObject).length === 0){
-
-									app.announcement = 'To już wszystkie czasowniki!'
-								} else {
-									app.drawVerb()
-								}
 							}
 						}
 				})

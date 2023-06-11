@@ -21,34 +21,25 @@ class Learning extends CI_Controller
 	}
 	public function drawVerbs()
 	{
-//		$allVerbs = $this->allVerbs();
-//		if (isset($_POST['verb'])) {
-//			v($_POST);
-//			$frontVerbs = $_POST['verbs'];
-//			foreach ($allVerbs as $allVerb) {
-//				if ($allVerb === $frontVerbs) {
-//					echo 'hello';
-//				}
-//			}
-//		}
-//		v($allVerbs);
-//		v($verb->getVerbInPolish());
+		var_dump($_POST);
+
+		$verbsIds = $_POST['ids'];
+
+
+
+
 		$this->load->model('Repository\VerbsRepository', 'Model');
-		$max = $this->Model->getMaxId()['max_id'];
-		$min = $this->Model->getMinId()['min_id'];
-		$randomID = rand($min, $max);
 		$amountOfVerbs = $this->howManyVerbs();
-		$verb = $this->Model->getVerbFromDBById($randomID);
+		$verb = $this->Model->getVerbFromDBByIds($verbsIds);
 		/** @var Verb $verb */
-		if ($randomID === $verb->getId()) {
-			$verbs = [
-				'verbInPolish' => $verb->getVerbInPolish(),
-				'verbInInfinitive' => $verb->getVerbInInfinitive(),
-				'verbInPastSimple1' => $verb->getVerbInPastSimple1(),
-				'verbInPastParticiple1' => $verb->getVerbInPastParticiple1(),
-				'amountOfVerbs' => $amountOfVerbs
-			];
-		}
+		$verbs = [
+			'verbInPolish' => $verb->getVerbInPolish(),
+			'verbInInfinitive' => $verb->getVerbInInfinitive(),
+			'verbInPastSimple1' => $verb->getVerbInPastSimple1(),
+			'verbInPastParticiple1' => $verb->getVerbInPastParticiple1(),
+			'amountOfVerbs' => $amountOfVerbs,
+			'verbId' => $verb->getId()
+		];
 		echo json_encode($verbs, JSON_UNESCAPED_UNICODE);
 	}
 	public function checkTranslation()
