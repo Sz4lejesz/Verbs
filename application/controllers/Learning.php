@@ -15,32 +15,18 @@ class Learning extends CI_Controller
 		$verbs = $this->getVerbsFromDB();
 		$verbsArray = [];
 		foreach ($verbs as $verb) {
-			$verbsArray[$verb['verbInPolish']] = $verb['verbInPolish'];
+			$verbsArray[] = [
+				'id' => $verb['id'],
+				'verbInPolish' => $verb['verbInPolish'],
+				'verbInInfinitive' => $verb['verbInInfinitive'],
+				'verbInPastSimple1' => $verb['verbInPastSimple1'],
+				'verbInPastSimple2' => $verb['verbInPastSimple2'],
+				'verbInPastParticiple1' => $verb['verbInPastParticiple1'],
+				'verbInPastParticiple2' => $verb['verbInPastParticiple2'],
+				'additionalDescription' => $verb['additionalDescription']
+			];
 		}
 		echo json_encode($verbsArray);
-	}
-	public function drawVerbs()
-	{
-		var_dump($_POST);
-
-		$verbsIds = $_POST['ids'];
-
-
-
-
-		$this->load->model('Repository\VerbsRepository', 'Model');
-		$amountOfVerbs = $this->howManyVerbs();
-		$verb = $this->Model->getVerbFromDBByIds($verbsIds);
-		/** @var Verb $verb */
-		$verbs = [
-			'verbInPolish' => $verb->getVerbInPolish(),
-			'verbInInfinitive' => $verb->getVerbInInfinitive(),
-			'verbInPastSimple1' => $verb->getVerbInPastSimple1(),
-			'verbInPastParticiple1' => $verb->getVerbInPastParticiple1(),
-			'amountOfVerbs' => $amountOfVerbs,
-			'verbId' => $verb->getId()
-		];
-		echo json_encode($verbs, JSON_UNESCAPED_UNICODE);
 	}
 	public function checkTranslation()
 	{
