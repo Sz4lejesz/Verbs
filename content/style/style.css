@@ -411,7 +411,7 @@ textarea {
 }
 .learning-settings {
 	padding: 50px 50px 30px 50px;
-	width: 405px;
+	width: 600px;
 	background: white;
 	z-index: 20;
 	position: absolute;
@@ -447,85 +447,57 @@ textarea {
 .float-left {
 	float: left;
 }
-input[type=checkbox]{
-	height: 0;
-	width: 0;
+.toggle {
+	cursor: pointer;
+	display: inline-block;
+}
+
+.toggle-switch {
+	display: inline-block;
+	background: #ccc;
+	border-radius: 16px;
+	margin-top: 10px;
+	width: 50px;
+	height: 22px;
+	position: relative;
+	vertical-align: middle;
+	transition: background 0.25s;
+}
+.toggle-switch:before, .toggle-switch:after {
+	content: "";
+}
+.toggle-switch:before {
+	display: block;
+	background: linear-gradient(to bottom, #fff 0%, #eee 100%);
+	border-radius: 50%;
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+	width: 16px;
+	height: 16px;
+	position: absolute;
+	top: 3px;
+	left: 4px;
+	transition: left 0.25s;
+}
+.toggle:hover .toggle-switch:before {
+	background: linear-gradient(to bottom, #fff 0%, #fff 100%);
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+.toggle-checkbox:checked + .toggle-switch {
+	background: #56c080;
+}
+.toggle-checkbox:checked + .toggle-switch:before {
+	left: 30px;
+}
+
+.toggle-checkbox {
+	position: absolute;
 	visibility: hidden;
 }
-label {
-	float: right;
-	margin: 15px 0 0 0;
-	cursor: pointer;
-	text-indent: -9999px;
-	width: 40px;
-	height: 20px;
-	background: grey;
-	display: block;
-	border-radius: 10px;
+
+.toggle-label {
+	margin-left: 5px;
 	position: relative;
-}
-
-label:after {
-	content: '';
-	position: absolute;
-	top: 5px;
-	left: 5px;
-	width: 9px;
-	height: 9px;
-	background: #fff;
-	border-radius: 90px;
-	transition: 0.3s;
-}
-
-input:checked + label {
-	background: rgba(123,206,180,255);
-}
-
-input:checked + label:after {
-	left: calc(100% - 5px);
-	transform: translateX(-100%);
-}
-
-label:active:after {
-	width: 20px;
-}
-
-label2 {
-	 float: right;
-	 margin: 15px 0 0 0;
-	 cursor: pointer;
-	 text-indent: -9999px;
-	 width: 40px;
-	 height: 20px;
-	 background: rgba(123,206,180,255);
-	 display: block;
-	 border-radius: 10px;
-	 position: relative;
-}
-
-label2:after {
-	content: '';
-	position: absolute;
-	top: 5px;
-	left: 25px;
-	width: 9px;
-	height: 9px;
-	background: #fff;
-	border-radius: 90px;
-	transition: 0.3s;
-}
-
-input2:checked + label2 {
-	background: rgba(123,206,180,255);
-}
-
-input2:checked + label2:after {
-	left: calc(100% - 5px);
-	transform: translateX(-100%);
-}
-
-label2:active:after {
-	width: 20px;
+	top: 2px;
 }
 .apply-settings {
 	width: 120px;
@@ -568,4 +540,22 @@ label2:active:after {
 }
 .font-weight-bold {
 	font-weight: bold;
+}
+.z-index-5 {
+	z-index: 5;
+}
+.text {
+	font-weight: lighter;
+	color: gray;
+	font-size: 14px;
+}
+.number-input {
+	padding: 5px 5px 5px 10px;
+	margin: 5px 5px 5px 0;
+	width: 100px;
+	border: 1px gray solid;
+	border-radius: 5px;
+	-webkit-appearance: none;
+	height: 30px;
+	font-size: 18px;
 }

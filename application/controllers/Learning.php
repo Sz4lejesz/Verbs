@@ -33,8 +33,8 @@ class Learning extends CI_Controller
 		$form = $_POST['verbs'];
 		$x = $_POST['x'];
 		/** @var Verb $verb */
-		$verb = $this->getVerbFromDB($x['main'], $x['choosen']);
-		//		v(trim(strtoupper($form['verbInInfinitive'])));
+		$verb = $this->getVerbFromDB($x['drawnVerb'], $x['verbForm']);
+//		v(trim(strtoupper($form['verbInInfinitive'])));
 //		v(trim(strtoupper($verb->getVerbInInfinitive())));
 //		v(trim(strtoupper($form['verbInPastSimple'])));
 //		v(trim(strtoupper($verb->getVerbInPastSimple1())));
@@ -49,23 +49,16 @@ class Learning extends CI_Controller
 			trim(mb_strtoupper($form['verbInPolish'], 'UTF-8')) === trim(mb_strtoupper($verb->getVerbInPolish(), 'UTF-8'))
 		) {
 			$data = [
-				'communicate' => 'Wszystko ok!'
+				'communicate' => 'Wszystko ok!',
+				'allRight' => 1
 			];
 		} else {
 			$data = [
-				'communicate' => 'Błąd!'
+				'communicate' => 'Błąd!',
+				'allRight' => 0
 			];
 		}
 		echo json_encode($data);
-	}
-	private function howManyVerbs()
-	{
-		$result = $this->getVerbsFromDB();
-		$i = 0;
-		foreach ($result as $row) {
-			$i++;
-		}
-		return $i;
 	}
 	private function getVerbsFromDB()
 	{

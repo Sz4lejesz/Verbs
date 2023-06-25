@@ -12,10 +12,10 @@ require_once 'header.php';
 		<div class="name">Marcin</div>
 	</div>
 	<div class="clearfix"></div>
-	<div class="randomized-verb" v-if="verbInPolishMODE">{{ x.main }}</div>
-	<div class="randomized-verb" v-if="verbInInfinitiveMODE">{{ x.main }}</div>
-	<div class="randomized-verb" v-if="verbInPastSimpleMODE">{{ x.main }}</div>
-	<div class="randomized-verb" v-if="verbInPastParticipleMODE">{{ x.main }}</div>
+	<div class="randomized-verb" v-if="verbInPolishMODE">{{ x.drawnVerb }}</div>
+	<div class="randomized-verb" v-if="verbInInfinitiveMODE">{{ x.drawnVerb }}</div>
+	<div class="randomized-verb" v-if="verbInPastSimpleMODE">{{ x.drawnVerb }}</div>
+	<div class="randomized-verb" v-if="verbInPastParticipleMODE">{{ x.drawnVerb }}</div>
 	<img src="content/images/settings.png" height="21" width="21" class="settings" @click="settingsPopUp = true"/>
 	<div class="clearfix"></div>
 	<div class="learning-stripe"></div>
@@ -52,7 +52,6 @@ require_once 'header.php';
 			<input type="text" class="learning-past-simple-input" v-model="verbs.verbInInfinitive">
 			<input type="text" class="learning-infinitive-input" v-model="verbs.verbInPastSimple">
 		</div>
-
 	</div>
 	<div class="overlay" v-if="settingsPopUp"></div>
 	<div class="clearfix"></div>
@@ -68,14 +67,25 @@ require_once 'header.php';
 		<div class="clearfix"></div>
 		<div class="learning-stripe"></div>
 		<div class="learning-row">Nie wyświetlaj tych które już umiem</div>
-		<input type="checkbox" @click="showMistakesBox = !showMistakesBox" id="switch"/><label for="switch"></label>
+		<label class="toggle float-right">
+			<input class="toggle-checkbox" type="checkbox" @click="showMistakesBox = !showMistakesBox">
+			<div class="toggle-switch"></div>
+		</label>
+		<div class="div" v-if="showMistakesBox">
+			<div class="z-index-5 float-left text">Po ilu poprawnych odpowiedziach przestać powtarzać dany czasownik na liście do nauki?
+			</div>
+			<input v-model="repeatNeededTimes" min="1" class="float-left number-input">
+		</div>
 		<div class="clearfix"></div>
 		<div class="learning-stripe"></div>
 		<div class="learning-row">Używać pełnej listy czasowników?</div>
-		<!--			<input2 type="checkbox" id="switch2" /><label2 for="switch2"></label2>-->
+		<label class="toggle float-right">
+			<input class="toggle-checkbox" type="checkbox">
+			<div class="toggle-switch"></div>
+		</label>
 		<div class="clearfix"></div>
 		<div class="learning-stripe"></div>
-		<div class="apply-settings float-right" @click="settingsPopUp = false, drawVerb()" >Zastosuj</div>
+		<div class="apply-settings float-right" @click="settingsPopUp = false, drawVerb(), onlyNumbers()" >Zastosuj</div>
 	</div>
 	<div class="clearfix"></div>
 	<div class="learning-stripe"></div>
@@ -84,7 +94,7 @@ require_once 'header.php';
 	<div class="learning-button" @click="drawVerb()">🙀&nbspNowy</div>
 	<div class="add-to-group-button">✔️&nbspDodaj do grupy</div>
 	<div class="clearfix"></div>
-	<div class="learning-announcement">{{ announcement }}</div>
+	<div class="learning-announcement" >{{ announcement }}</div>
 	<div class="correct-results-box" v-if="learningPopUp">
 		<div class="overlay" v-if="settingsPopUp"></div>
 		<div class="learning-stripe mt-15"></div>
@@ -96,11 +106,11 @@ require_once 'header.php';
 <div class="mistakes-box" v-if="showMistakesBox">
 	<div class="left-to-learn">
 		<div class="left">Pozostało</div>
-		<div class="left-number">{{ verbsLeftToLearn }}</div>
+		<div class="left-number">{{ allVerbsArray.length }}</div>
 	</div>
 	<div class="left-to-learn">
 		<div class="left">Umiesz już</div>
-		<div class="left-number">{{ learntVerbs }}</div>
+		<div class="left-number">{{ learnedVerbsArray.length }}</div>
 	</div>
 	<div class="info-box">
 		<div class="float-left">Lista poznanych czasowników</div>
@@ -108,10 +118,12 @@ require_once 'header.php';
 		<div class="clearfix"></div>
 		<div class="mistakes-stripe"></div>
 		<div class="font-weight-bold" v-for="verb in learnedVerbsArray">
+			<div v-if="showVerb(verb)">
 			{{verb.verbInInfinitive}} -
 			{{verb.verbInPastSimple}} -
 			{{verb.verbInPastParticiple}} ⟶
 			{{verb.verbInPolish}}
+			</div>
 		</div>
 	</div>
 	<div class="clearfix"></div>
@@ -123,10 +135,10 @@ createApp({
 	data() {
 		return {
 			i: 0,
+			repeatNeededTimes: 1,
 			learnedVerbsArray: [],
-			learnedVerbsIds: [],
-			verbsLeftToLearn: 0,
-			learntVerbs: 0,
+			allRight: 1,
+			randomId: null,
 			mistakes: 0,
 			showMistakesBox: true,
 			verbInPolishMODE: true,
@@ -147,54 +159,67 @@ createApp({
 				verbInPastParticiple: ''
 			},
 			x: {
-				main: null,
-				choosen: 'verbInPolish'
+				drawnVerb: null,
+				verbForm: 'verbInPolish'
 			},
 			allVerbsArray: [],
 		}
 	},
 	methods: {
+		showVerb(verb) {
+			return verb.passedTests === 2;
+		},
+		onlyNumbers() {
+		this.repeatNeededTimes = this.repeatNeededTimes.replace(/[^0-9]/g,'')
+		},
 		goToVerbs() {
 			window.location = 'http://localhost/verbs/verb_list'
 		},
 		drawVerb() {
-			console.log(this.allVerbsArray);
-			let randomKey = Math.floor(Math.random() * this.allVerbsArray.length);
-			console.log(randomKey);
-			this.allVerbsArray.splice(randomKey, 1);
-			if (this.allVerbsArray.length !== 0) {
-				console.log(this.allVerbsArray[1]['verbInPolish'])
-				this.x.main = this.allVerbsArray[1]['verbInPolish']
+			// console.log(this.learnedVerbsArray)
+			this.randomId = Math.floor(Math.random() * this.allVerbsArray.length);
+			this.verbInPolish = this.allVerbsArray[this.randomId]['verbInPolish'];
+			this.verbInInfinitive = this.allVerbsArray[this.randomId]['verbInInfinitive'];
+			this.verbInPastParticiple = this.allVerbsArray[this.randomId]['verbInPastParticiple1'];
+			this.verbInPastSimple = this.allVerbsArray[this.randomId]['verbInPastSimple1'];
+			this.x.drawnVerb = this.allVerbsArray[this.randomId]['verbInPolish'];
+			if (this.announcement === 'Wszystko ok!') {
+				this.verbs.verbInInfinitive = '';
+				this.verbs.verbInPolish = '';
+				this.verbs.verbInPastSimple = '';
+				this.verbs.verbInPastParticiple = '';
+				this.announcement = '';
 			}
-			// this.verbInPolish = this.allVerbsArray[1]
-			// if (this.verbsLeftToLearn === 0) {
-			// 	this.verbsLeftToLearn = response.data.amountOfVerbs;
-			// }
-			// if (this.announcement === 'Wszystko ok!') {
-			// 	this.verbs.verbInInfinitive = '';
-			// 	this.verbs.verbInPolish = '';
-			// 	this.verbs.verbInPastSimple = '';
-			// 	this.verbs.verbInPastParticiple = '';
-			// 	this.announcement = '';
-			// }
-			// switch (this.x.choosen) {
-			// 	case 'verbInInfinitive':
-			// 		this.verbs.verbInInfinitive = response.data.verbInInfinitive;
-			// 		break;
-			// 	case 'verbInPolish':
-			// 		this.verbs.verbInPolish = response.data.verbInPolish;
-			// 		break;
-			// 	case 'verbInPastSimple1':
-			// 		this.verbs.verbInPastSimple = response.data.verbInPastSimple1;
-			// 		break;
-			// 	case 'verbInPastParticiple1':
-			// 		this.verbs.verbInPastParticiple = response.data.verbInPastParticiple1;
-			// }
-			// this.x.main = response.data[this.x.choosen];
+			switch (this.x.verbForm) {
+				case 'verbInInfinitive':
+					this.verbs.verbInInfinitive = this.allVerbsArray[this.randomId]['verbInInfinitive'];
+					this.x.drawnVerb = this.allVerbsArray[this.randomId]['verbInInfinitive'];
+					break;
+				case 'verbInPolish':
+					this.verbs.verbInPolish = this.allVerbsArray[this.randomId]['verbInPolish'];
+					this.x.drawnVerb = this.allVerbsArray[this.randomId]['verbInPolish'];
+					break;
+				case 'verbInPastSimple1':
+					this.verbs.verbInPastSimple = this.allVerbsArray[this.randomId]['verbInPastSimple1'];
+					this.x.drawnVerb = this.allVerbsArray[this.randomId]['verbInPastSimple1'];
+					break;
+				case 'verbInPastParticiple1':
+					this.verbs.verbInPastParticiple = this.allVerbsArray[this.randomId]['verbInPastParticiple1'];
+					this.x.drawnVerb = this.allVerbsArray[this.randomId]['verbInPastParticiple1'];
+			}
 		},
 		checkTranslation()
 		{
 			let app = this;
+			// let match = false;
+			//  this.learnedVerbsArray.forEach(verb => {
+			// 	 if (verb['verbInPolish'] === (this.x.drawnVerb)) {
+			// 		 match = true;
+			// 	 }
+			//  })
+			// if (match) {
+			// 	return;
+			// }
 			axios.post('Learning/checkTranslation',
 				{verbs: this.verbs, x: this.x}, {
 					headers: {
@@ -204,62 +229,34 @@ createApp({
 				.then(function (response) {
 					if (response.data) {
 						app.announcement = response.data.communicate;
-						app.mistakes = app.announcement === 'Błąd!' ? app.mistakes + 1 : app.mistakes;
-						app.announcement === 'Wszystko ok!' ? app.addVerbToLearned() : undefined;
-						// if (app.announcement === 'Wszystko ok!'){
-						// 	app.addVerbToLearned();
-						// }
-					}
+						app.allRight = response.data.allRight;
+						if (app.allRight) {
+							if (app.learnedVerbsArray.length !== 0) {
+								for (let i = 0; i < app.learnedVerbsArray.length; i++) {
+									let verb = app.learnedVerbsArray[i];
+									// if (verb['verbInPolish'] === (app.x.drawnVerb)) {
+									if (verb['id'] === (app.randomId)) {
+										if (verb['passedTests'] < 2) {
+											app.learnedVerbsArray[i].passedTests++;
+										} else {
+											app.addVerbToLearned();
+											app.allVerbsArray.splice(app.randomId, 1);
+										}
+									}
+								}
+							} else {
+								app.addVerbToLearned();
+							}
 
+						} else if (app.allRight === 0) {
+							app.mistakes++;
+
+						}
+					}
 				})
 				.catch(function (error) {
 					console.log(error);
 				});
-		},
-		verbFormChange(e)
-		{
-			this.x.choosen = e.srcElement.value
-			this.verbInInfinitiveMODE = false;
-			this.verbInPolishMODE = false;
-			this.verbInPastParticipleMODE = false;
-			this.verbInPastSimpleMODE = false;
-			this.verbs.verbInPolish = null;
-			this.verbs.verbInInfinitive = null;
-			this.verbs.verbInPastSimple = null;
-			this.verbs.verbInPastParticiple = null;
-			switch (this.x.choosen) {
-				case 'verbInInfinitive':
-					this.verbInInfinitiveMODE = true;
-					break;
-				case 'verbInPolish':
-					this.verbInPolishMODE = true;
-					break;
-				case 'verbInPastSimple1':
-					this.verbInPastSimpleMODE = true;
-					break;
-				case 'verbInPastParticiple1':
-					this.verbInPastParticipleMODE = true;
-					break;
-				case '5':
-					let random = Math.floor(Math.random() * 4) + 1;
-					switch (random) {
-						case 1:
-							this.verbInInfinitiveMODE = true;
-							this.x.choosen = 'verbInInfinitive';
-							break;
-						case 2:
-							this.verbInPolishMODE = true;
-							this.x.choosen = 'verbInPolish';
-							break;
-						case 3:
-							this.verbInPastSimpleMODE = true;
-							this.x.choosen = 'verbInPastSimple1';
-							break;
-						case 4:
-							this.verbInPastParticipleMODE = true;
-							this.x.choosen = 'verbInPastParticiple1';
-					}
-			}
 		},
 		addVerbToLearned()
 		{
@@ -267,42 +264,75 @@ createApp({
 				'verbInPolish': this.verbs.verbInPolish,
 				'verbInInfinitive': this.verbs.verbInInfinitive,
 				'verbInPastParticiple': this.verbs.verbInPastParticiple,
-				'verbInPastSimple': this.verbs.verbInPastSimple
+				'verbInPastSimple': this.verbs.verbInPastSimple,
+				'id': this.allVerbsArray[this.randomId]['id'],
+				'passedTests': 1
 			}
-			if (this.learnedVerbsArray[0] === undefined) {
-				this.learnedVerbsArray.push(verb);
-				delete this.allVerbsArray[this.verbInPolish];
-				this.verbsLeftToLearn--;
-				this.learntVerbs++;
-			}
-			if (this.learnedVerbsArray[this.i].verbInPolish !== this.verbs.verbInPolish) {
-				this.learnedVerbsArray.push(verb);
-				delete this.allVerbsArray[this.verbInPolish];
-				this.verbsLeftToLearn--;
-				this.learntVerbs++;
-				this.i++;
-			}
+			this.learnedVerbsArray.push(verb);
 		},
-
 		async allVerbs() {
 			let app = this;
-			await axios.get('Learning/allVerbs', {
-				headers: {
-					'Accept': 'application/json'
-				}
-			})
-				.then(function (response) {
-					if (response.data) {
-						app.allVerbsArray = response.data;
+			try {
+				let response = await axios.get('Learning/allVerbs', {
+					headers: {
+						'Accept': 'application/json'
 					}
 				})
-				.catch(function (error) {
-					console.log(error);
-				});
+				if (response.data) {
+					this.allVerbsArray = response.data;
+					this.drawVerb()
+				}
+			} catch (error) {
+				console.log(error)
+			}
+		},
+	},
+	verbFormChange(e)
+	{
+		this.x.verbForm = e.srcElement.value
+		this.verbInInfinitiveMODE = false;
+		this.verbInPolishMODE = false;
+		this.verbInPastParticipleMODE = false;
+		this.verbInPastSimpleMODE = false;
+		this.verbs.verbInPolish = null;
+		this.verbs.verbInInfinitive = null;
+		this.verbs.verbInPastSimple = null;
+		this.verbs.verbInPastParticiple = null;
+		switch (this.x.verbForm) {
+			case 'verbInInfinitive':
+				this.verbInInfinitiveMODE = true;
+				break;
+			case 'verbInPolish':
+				this.verbInPolishMODE = true;
+				break;
+			case 'verbInPastSimple1':
+				this.verbInPastSimpleMODE = true;
+				break;
+			case 'verbInPastParticiple1':
+				this.verbInPastParticipleMODE = true;
+				break;
+			case '5':
+				let random = Math.floor(Math.random() * 4) + 1;
+				switch (random) {
+					case 1:
+						this.verbInInfinitiveMODE = true;
+						this.x.verbForm = 'verbInInfinitive';
+						break;
+					case 2:
+						this.verbInPolishMODE = true;
+						this.x.verbForm = 'verbInPolish';
+						break;
+					case 3:
+						this.verbInPastSimpleMODE = true;
+						this.x.verbForm = 'verbInPastSimple1';
+						break;
+					case 4:
+						this.verbInPastParticipleMODE = true;
+						this.x.verbForm = 'verbInPastParticiple1';
+				}
 		}
 	},
 	created() {
-		this.drawVerb();
 		this.allVerbs();
 	},
 	computed: {
