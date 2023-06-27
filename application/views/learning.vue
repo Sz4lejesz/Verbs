@@ -110,7 +110,7 @@ require_once 'header.php';
 	</div>
 	<div class="left-to-learn">
 		<div class="left">Umiesz już</div>
-		<div class="left-number">{{ learnedVerbsArray.length }}</div>
+		<div class="left-number">{{ learnedVerbs }}</div>
 	</div>
 	<div class="info-box">
 		<div class="float-left">Lista poznanych czasowników</div>
@@ -138,9 +138,10 @@ createApp({
 			repeatNeededTimes: 1,
 			learnedVerbsArray: [],
 			allRight: 1,
+			learnedVerbs: 0,
 			randomId: null,
 			mistakes: 0,
-			showMistakesBox: true,
+			showMistakesBox: false,
 			verbInPolishMODE: true,
 			verbInPastParticipleMODE: false,
 			verbInPastSimpleMODE: false,
@@ -167,7 +168,7 @@ createApp({
 	},
 	methods: {
 		showVerb(verb) {
-			return verb.passedTests === 2;
+			return parseInt(verb.passedTests) === parseInt(this.repeatNeededTimes);
 		},
 		onlyNumbers() {
 		this.repeatNeededTimes = this.repeatNeededTimes.replace(/[^0-9]/g,'')
@@ -211,15 +212,6 @@ createApp({
 		checkTranslation()
 		{
 			let app = this;
-			// let match = false;
-			//  this.learnedVerbsArray.forEach(verb => {
-			// 	 if (verb['verbInPolish'] === (this.x.drawnVerb)) {
-			// 		 match = true;
-			// 	 }
-			//  })
-			// if (match) {
-			// 	return;
-			// }
 			axios.post('Learning/checkTranslation',
 				{verbs: this.verbs, x: this.x}, {
 					headers: {
@@ -229,34 +221,49 @@ createApp({
 				.then(function (response) {
 					if (response.data) {
 						app.announcement = response.data.communicate;
+						let flag = true;
 						app.allRight = response.data.allRight;
 						if (app.allRight) {
-							if (app.learnedVerbsArray.length !== 0) {
-								for (let i = 0; i < app.learnedVerbsArray.length; i++) {
-									let verb = app.learnedVerbsArray[i];
-									// if (verb['verbInPolish'] === (app.x.drawnVerb)) {
-									if (verb['id'] === (app.randomId)) {
-										if (verb['passedTests'] < 2) {
-											app.learnedVerbsArray[i].passedTests++;
-										} else {
-											app.addVerbToLearned();
-											app.allVerbsArray.splice(app.randomId, 1);
-										}
-									}
-								}
-							} else {
+							if (app.repeatNeededTimes === 1) {
 								app.addVerbToLearned();
+								app.allVerbsArray.splice(this.randomId, 1);
+								app.learnedVerbs++;
+							} else {
+								if (!app.isVerbAdded(app.x.drawnVerb)) {
+									app.addVerbToLearned();
+								} else {
+									app.isVerbAddedXTimes(app.repeatNeededTimes, app.x.drawnVerb);
+								}
 							}
-
-						} else if (app.allRight === 0) {
+						} else {
 							app.mistakes++;
-
 						}
 					}
 				})
 				.catch(function (error) {
 					console.log(error);
 				});
+		},
+		isVerbAddedXTimes(times, verb)
+		{
+			for (let i = 0 ; i < this.learnedVerbsArray.length; i++) {
+				if (this.learnedVerbsArray[i].passedTests < times) {
+					if (this.learnedVerbsArray[i].verbInPolish === verb) {
+						this.learnedVerbsArray[i].passedTests++;
+					}
+				}
+			}
+			this.allVerbsArray.splice(this.randomId, 1);
+			this.learnedVerbs++;
+		},
+		isVerbAdded(verb)
+		{
+			for (let i = 0 ; i < this.learnedVerbsArray.length; i++) {
+				if (this.learnedVerbsArray[i].verbInPolish === verb) {
+					return true;
+				}
+			}
+			return false;
 		},
 		addVerbToLearned()
 		{
@@ -266,7 +273,8 @@ createApp({
 				'verbInPastParticiple': this.verbs.verbInPastParticiple,
 				'verbInPastSimple': this.verbs.verbInPastSimple,
 				'id': this.allVerbsArray[this.randomId]['id'],
-				'passedTests': 1
+				'passedTests': 1,
+				'mistakesMade': 0
 			}
 			this.learnedVerbsArray.push(verb);
 		},
